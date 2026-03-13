@@ -5,59 +5,30 @@
 <title>Ultimate City Racer PRO</title>
 
 <style>
-body{
-margin:0;
-overflow:hidden;
-background:#000;
-font-family:Arial;
-}
+body{margin:0;overflow:hidden;background:#000;font-family:Arial;}
 
 #ui{
-position:absolute;
-top:10px;
-left:10px;
-color:white;
-background:rgba(0,0,0,0.6);
-padding:12px;
-border-radius:10px;
+position:absolute;top:10px;left:10px;color:white;
+background:rgba(0,0,0,0.6);padding:12px;border-radius:10px;
 }
 
 #message{
-position:absolute;
-top:50%;
-left:50%;
+position:absolute;top:50%;left:50%;
 transform:translate(-50%,-50%);
-color:white;
-font-size:55px;
-display:none;
-text-align:center;
+color:white;font-size:55px;display:none;text-align:center;
 }
 
 #controls{
-position:absolute;
-bottom:20px;
-width:100%;
-text-align:center;
+position:absolute;bottom:20px;width:100%;text-align:center;
 }
 
 button{
-font-size:22px;
-padding:14px 20px;
-margin:5px;
-border:none;
-border-radius:10px;
-background:#ffffffcc;
+font-size:22px;padding:14px 20px;margin:5px;
+border:none;border-radius:10px;background:#ffffffcc;
 }
 
-#nitro{
-background:#ff4444;
-color:white;
-}
-
-#mode{
-background:#4444ff;
-color:white;
-}
+#nitro{background:#ff4444;color:white;}
+#mode{background:#4444ff;color:white;}
 </style>
 </head>
 
@@ -81,14 +52,14 @@ color:white;
 
 <script>
 
-/* Scene */
+/* SCENE */
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x87ceeb);
 
-/* Camera */
+/* CAMERA */
 
-const camera = new THREE.PerspectiveCamera(
+const camera=new THREE.PerspectiveCamera(
 75,
 window.innerWidth/window.innerHeight,
 0.1,
@@ -97,15 +68,15 @@ window.innerWidth/window.innerHeight,
 
 camera.position.set(0,6,14);
 
-/* Renderer */
+/* RENDERER */
 
-const renderer = new THREE.WebGLRenderer({antialias:true});
+const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth,window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-/* Lights */
+/* LIGHT */
 
-let sun = new THREE.DirectionalLight(0xffffff,1);
+let sun=new THREE.DirectionalLight(0xffffff,1);
 sun.position.set(10,40,20);
 scene.add(sun);
 
@@ -113,19 +84,18 @@ scene.add(new THREE.AmbientLight(0xffffff,0.6));
 
 /* ROAD */
 
-const roadLength = 7000;
+const roadLength=7000;
 
-const road = new THREE.Mesh(
+const road=new THREE.Mesh(
 new THREE.PlaneGeometry(20,roadLength),
 new THREE.MeshStandardMaterial({color:0x444444})
 );
 
-road.rotation.x = -Math.PI/2;
-road.position.z = -roadLength/2;
-
+road.rotation.x=-Math.PI/2;
+road.position.z=-roadLength/2;
 scene.add(road);
 
-/* Buildings */
+/* BUILDINGS */
 
 function randomColor(){
 const colors=[0xff4d4d,0xffa64d,0xffff4d,0x4dff88,0x4dd2ff,0x7a4dff];
@@ -150,9 +120,9 @@ createBuilding(-32,i);
 createBuilding(32,i);
 }
 
-/* Player Car */
+/* PLAYER CAR */
 
-const car = new THREE.Mesh(
+const car=new THREE.Mesh(
 new THREE.BoxGeometry(2,0.5,4),
 new THREE.MeshStandardMaterial({color:0xffff00})
 );
@@ -160,7 +130,7 @@ new THREE.MeshStandardMaterial({color:0xffff00})
 car.position.y=0.25;
 scene.add(car);
 
-/* Enemies */
+/* ENEMIES */
 
 const enemies=[];
 
@@ -171,8 +141,6 @@ new THREE.BoxGeometry(2,0.5,4),
 new THREE.MeshStandardMaterial({color:0xff0000})
 );
 
-/* spawn in lanes */
-
 let lanes=[-6,-3,0,3,6];
 
 e.position.set(
@@ -181,8 +149,6 @@ lanes[Math.floor(Math.random()*lanes.length)],
 z
 );
 
-/* zigzag behavior */
-
 e.userData={
 zigzag:Math.random()>0.6,
 direction:Math.random()>0.5?1:-1
@@ -190,16 +156,13 @@ direction:Math.random()>0.5?1:-1
 
 scene.add(e);
 enemies.push(e);
-
 }
-
-/* MANY enemies */
 
 for(let i=-100;i>-6500;i-=45){
 spawnEnemy(i);
 }
 
-/* Coins */
+/* COINS */
 
 const coins=[];
 
@@ -215,14 +178,13 @@ c.position.set(Math.random()*12-6,1,z);
 
 scene.add(c);
 coins.push(c);
-
 }
 
 for(let i=-100;i>-6500;i-=50){
 spawnCoin(i);
 }
 
-/* Rain */
+/* RAIN */
 
 const rain=[];
 
@@ -241,15 +203,9 @@ Math.random()*200-100
 
 scene.add(drop);
 rain.push(drop);
-
 }
 
-/* Checkpoints */
-
-let checkpoints=[-1000,-2000,-3000,-4000,-5000];
-let checkpointIndex=0;
-
-/* Finish */
+/* FINISH */
 
 const finish=new THREE.Mesh(
 new THREE.BoxGeometry(20,6,1),
@@ -259,17 +215,17 @@ new THREE.MeshStandardMaterial({color:0xffffff})
 finish.position.set(0,3,-6500);
 scene.add(finish);
 
-/* Sounds */
+/* SOUNDS */
 
-const engineSound = new Audio("sounds/engine.mp3");
+const engineSound=new Audio("sounds/engine.mp3");
 engineSound.loop=true;
 engineSound.volume=0.3;
 engineSound.play();
 
-const coinSound = new Audio("sounds/coin.mp3");
-const crashSound = new Audio("sounds/crash.mp3");
+const coinSound=new Audio("sounds/coin.mp3");
+const crashSound=new Audio("sounds/crash.mp3");
 
-/* Controls */
+/* CONTROLS */
 
 let keys={};
 let tilt=0;
@@ -277,33 +233,35 @@ let tilt=0;
 document.addEventListener("keydown",e=>keys[e.key]=true);
 document.addEventListener("keyup",e=>keys[e.key]=false);
 
-/* Mobile tilt fix */
-
-function enableTilt(){
-
-if(typeof DeviceOrientationEvent!=="undefined" &&
-typeof DeviceOrientationEvent.requestPermission==="function"){
-
-DeviceOrientationEvent.requestPermission()
-.then(permissionState=>{
-if(permissionState==="granted"){
-window.addEventListener("deviceorientation",handleTilt);
-}
-});
-
-}else{
-window.addEventListener("deviceorientation",handleTilt);
-}
-
-}
+/* UNIVERSAL TILT SUPPORT */
 
 function handleTilt(e){
 tilt=e.gamma||0;
 }
 
-window.addEventListener("click",enableTilt);
+/* Android + most devices */
 
-/* Mobile Buttons */
+window.addEventListener("deviceorientation",handleTilt,true);
+
+/* iOS permission */
+
+function requestIOSPermission(){
+if(typeof DeviceOrientationEvent!=="undefined" &&
+typeof DeviceOrientationEvent.requestPermission==="function"){
+
+DeviceOrientationEvent.requestPermission()
+.then(response=>{
+if(response==="granted"){
+window.addEventListener("deviceorientation",handleTilt,true);
+}
+}).catch(console.error);
+
+}
+}
+
+window.addEventListener("click",requestIOSPermission);
+
+/* MOBILE BUTTONS */
 
 left.ontouchstart=()=>keys["ArrowLeft"]=true;
 right.ontouchstart=()=>keys["ArrowRight"]=true;
@@ -311,14 +269,14 @@ right.ontouchstart=()=>keys["ArrowRight"]=true;
 left.ontouchend=()=>keys["ArrowLeft"]=false;
 right.ontouchend=()=>keys["ArrowRight"]=false;
 
-/* Nitro */
+/* NITRO */
 
 let nitro=false;
 
 nitro.onclick=()=>nitro=true;
 nitro.ontouchend=()=>nitro=false;
 
-/* Day Night */
+/* DAY NIGHT */
 
 let night=false;
 
@@ -326,23 +284,20 @@ mode.onclick=function(){
 
 night=!night;
 
-if(night){
-scene.background=new THREE.Color(0x000010);
-}else{
-scene.background=new THREE.Color(0x87ceeb);
-}
+scene.background=night
+?new THREE.Color(0x000010)
+:new THREE.Color(0x87ceeb);
 
 }
 
-/* Game State */
+/* GAME STATE */
 
 let score=0;
 let gameOver=false;
 
 const scoreDisplay=document.getElementById("score");
-const cpDisplay=document.getElementById("checkpoint");
 
-/* Game Loop */
+/* GAME LOOP */
 
 function animate(){
 
@@ -354,7 +309,7 @@ let speed=nitro?1.6:0.8;
 
 car.position.z-=speed;
 
-/* Steering */
+/* STEERING */
 
 car.position.x+=tilt*0.03;
 
@@ -363,13 +318,11 @@ if(keys["ArrowRight"]) car.position.x+=0.4;
 
 car.position.x=Math.max(-8,Math.min(8,car.position.x));
 
-/* Enemy movement */
+/* ENEMIES */
 
 enemies.forEach(e=>{
 
 e.position.z+=1.1;
-
-/* zigzag */
 
 if(e.userData.zigzag){
 e.position.x+=0.05*e.userData.direction;
@@ -389,7 +342,7 @@ endGame("💥 CRASHED");
 
 });
 
-/* Coins */
+/* COINS */
 
 coins.forEach(c=>{
 
@@ -409,24 +362,14 @@ scoreDisplay.innerText="Coins: "+score;
 
 });
 
-/* Rain animation */
+/* RAIN */
 
 rain.forEach(r=>{
 r.position.y-=1;
 if(r.position.y<0) r.position.y=40;
 });
 
-/* Checkpoints */
-
-if(checkpointIndex<checkpoints.length &&
-car.position.z<checkpoints[checkpointIndex]){
-
-checkpointIndex++;
-cpDisplay.innerText="Checkpoint: "+checkpointIndex;
-
-}
-
-/* Finish */
+/* FINISH */
 
 if(car.position.z<-6500){
 endGame("🏁 YOU WON!");
@@ -434,7 +377,7 @@ endGame("🏁 YOU WON!");
 
 }
 
-/* Camera */
+/* CAMERA */
 
 camera.position.x=car.position.x;
 camera.position.z=car.position.z+14;
@@ -446,7 +389,7 @@ renderer.render(scene,camera);
 
 animate();
 
-/* End */
+/* END GAME */
 
 function endGame(text){
 
@@ -458,7 +401,7 @@ msg.style.display="block";
 
 }
 
-/* Resize */
+/* RESIZE */
 
 window.addEventListener("resize",()=>{
 
