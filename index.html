@@ -111,7 +111,7 @@ scene.add(sun);
 
 scene.add(new THREE.AmbientLight(0xffffff,0.6));
 
-/* ROAD (extended till finish) */
+/* ROAD */
 
 const roadLength = 7000;
 
@@ -122,7 +122,6 @@ new THREE.MeshStandardMaterial({color:0x444444})
 
 road.rotation.x = -Math.PI/2;
 road.position.z = -roadLength/2;
-
 scene.add(road);
 
 /* Buildings */
@@ -174,12 +173,11 @@ new THREE.MeshStandardMaterial({color:0xff0000})
 e.position.set(Math.random()*12-6,0.25,z);
 scene.add(e);
 enemies.push(e);
-
 }
 
-/* enemies till finish */
+/* More enemies till finish */
 
-for(let i=-150;i>-6500;i-=80){
+for(let i=-150;i>-6500;i-=70){
 spawnEnemy(i);
 }
 
@@ -199,10 +197,7 @@ c.position.set(Math.random()*12-6,1,z);
 
 scene.add(c);
 coins.push(c);
-
 }
-
-/* coins till finish */
 
 for(let i=-100;i>-6500;i-=50){
 spawnCoin(i);
@@ -227,13 +222,7 @@ Math.random()*200-100
 
 scene.add(drop);
 rain.push(drop);
-
 }
-
-/* Checkpoints */
-
-let checkpoints=[-1000,-2000,-3000,-4000,-5000];
-let checkpointIndex=0;
 
 /* Finish */
 
@@ -260,12 +249,39 @@ const crashSound = new Audio("sounds/crash.mp3");
 let keys={};
 let tilt=0;
 
+/* Keyboard */
+
 document.addEventListener("keydown",e=>keys[e.key]=true);
 document.addEventListener("keyup",e=>keys[e.key]=false);
 
-window.addEventListener("deviceorientation",e=>{
-tilt=e.gamma;
-});
+/* Mobile tilt FIX */
+
+function enableTilt(){
+
+if (typeof DeviceOrientationEvent !== "undefined" &&
+typeof DeviceOrientationEvent.requestPermission === "function") {
+
+DeviceOrientationEvent.requestPermission()
+.then(permissionState => {
+if (permissionState === "granted") {
+window.addEventListener("deviceorientation", handleTilt);
+}
+})
+.catch(console.error);
+
+}else{
+
+window.addEventListener("deviceorientation", handleTilt);
+
+}
+
+}
+
+function handleTilt(e){
+tilt = e.gamma || 0;
+}
+
+window.addEventListener("click", enableTilt);
 
 /* Mobile Buttons */
 
@@ -304,7 +320,6 @@ let score=0;
 let gameOver=false;
 
 const scoreDisplay=document.getElementById("score");
-const cpDisplay=document.getElementById("checkpoint");
 
 /* Game Loop */
 
@@ -320,16 +335,18 @@ car.position.z-=speed;
 
 /* Steering */
 
-car.position.x+=tilt*0.02;
+car.position.x+=tilt*0.03;
 
 if(keys["ArrowLeft"]) car.position.x-=0.4;
 if(keys["ArrowRight"]) car.position.x+=0.4;
 
 car.position.x=Math.max(-8,Math.min(8,car.position.x));
 
-/* Enemies */
+/* Enemy movement toward player */
 
 enemies.forEach(e=>{
+
+e.position.z += 0.6;
 
 if(
 Math.abs(e.position.z-car.position.z)<2 &&
@@ -361,27 +378,12 @@ scoreDisplay.innerText="Coins: "+score;
 
 });
 
-/* Rain animation */
+/* Rain */
 
 rain.forEach(r=>{
-
 r.position.y-=1;
-
-if(r.position.y<0){
-r.position.y=40;
-}
-
+if(r.position.y<0) r.position.y=40;
 });
-
-/* Checkpoints */
-
-if(checkpointIndex<checkpoints.length &&
-car.position.z<checkpoints[checkpointIndex]){
-
-checkpointIndex++;
-cpDisplay.innerText="Checkpoint: "+checkpointIndex;
-
-}
 
 /* Finish */
 
@@ -395,7 +397,6 @@ endGame("🏁 YOU WON!");
 
 camera.position.x=car.position.x;
 camera.position.z=car.position.z+14;
-
 camera.lookAt(car.position);
 
 renderer.render(scene,camera);
