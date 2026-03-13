@@ -36,7 +36,6 @@ border:none;border-radius:10px;background:#ffffffcc;
 
 <div id="ui">
 <div id="score">Coins: 0</div>
-<div id="checkpoint">Checkpoint: 0</div>
 </div>
 
 <div id="message"></div>
@@ -103,7 +102,6 @@ return colors[Math.floor(Math.random()*colors.length)];
 }
 
 function createBuilding(x,z){
-
 let h=Math.random()*60+20;
 
 let b=new THREE.Mesh(
@@ -233,19 +231,28 @@ let tilt=0;
 document.addEventListener("keydown",e=>keys[e.key]=true);
 document.addEventListener("keyup",e=>keys[e.key]=false);
 
-/* UNIVERSAL TILT SUPPORT */
+/* TILT STEERING */
 
-function handleTilt(e){
-tilt=e.gamma||0;
+function handleTilt(event){
+
+let gamma=event.gamma || 0;
+
+/* adjust if device rotated */
+
+if(window.orientation===90) gamma=event.beta;
+if(window.orientation===-90) gamma=-event.beta;
+
+tilt=gamma;
 }
 
-/* Android + most devices */
+/* activate sensors after first touch */
+
+function enableTilt(){
 
 window.addEventListener("deviceorientation",handleTilt,true);
 
 /* iOS permission */
 
-function requestIOSPermission(){
 if(typeof DeviceOrientationEvent!=="undefined" &&
 typeof DeviceOrientationEvent.requestPermission==="function"){
 
@@ -254,12 +261,17 @@ DeviceOrientationEvent.requestPermission()
 if(response==="granted"){
 window.addEventListener("deviceorientation",handleTilt,true);
 }
-}).catch(console.error);
+})
+.catch(console.error);
 
 }
+
+window.removeEventListener("touchstart",enableTilt);
+window.removeEventListener("click",enableTilt);
 }
 
-window.addEventListener("click",requestIOSPermission);
+window.addEventListener("touchstart",enableTilt);
+window.addEventListener("click",enableTilt);
 
 /* MOBILE BUTTONS */
 
@@ -281,13 +293,11 @@ nitro.ontouchend=()=>nitro=false;
 let night=false;
 
 mode.onclick=function(){
-
 night=!night;
 
 scene.background=night
 ?new THREE.Color(0x000010)
 :new THREE.Color(0x87ceeb);
-
 }
 
 /* GAME STATE */
@@ -309,7 +319,7 @@ let speed=nitro?1.6:0.8;
 
 car.position.z-=speed;
 
-/* STEERING */
+/* steering */
 
 car.position.x+=tilt*0.03;
 
@@ -318,7 +328,7 @@ if(keys["ArrowRight"]) car.position.x+=0.4;
 
 car.position.x=Math.max(-8,Math.min(8,car.position.x));
 
-/* ENEMIES */
+/* enemies */
 
 enemies.forEach(e=>{
 
@@ -342,7 +352,7 @@ endGame("💥 CRASHED");
 
 });
 
-/* COINS */
+/* coins */
 
 coins.forEach(c=>{
 
@@ -352,24 +362,22 @@ if(
 Math.abs(c.position.z-car.position.z)<2 &&
 Math.abs(c.position.x-car.position.x)<1.6
 ){
-
 scene.remove(c);
 score++;
 coinSound.play();
 scoreDisplay.innerText="Coins: "+score;
-
 }
 
 });
 
-/* RAIN */
+/* rain */
 
 rain.forEach(r=>{
 r.position.y-=1;
 if(r.position.y<0) r.position.y=40;
 });
 
-/* FINISH */
+/* finish */
 
 if(car.position.z<-6500){
 endGame("🏁 YOU WON!");
@@ -377,7 +385,7 @@ endGame("🏁 YOU WON!");
 
 }
 
-/* CAMERA */
+/* camera */
 
 camera.position.x=car.position.x;
 camera.position.z=car.position.z+14;
@@ -392,23 +400,18 @@ animate();
 /* END GAME */
 
 function endGame(text){
-
 gameOver=true;
-
 const msg=document.getElementById("message");
 msg.innerHTML=text;
 msg.style.display="block";
-
 }
 
 /* RESIZE */
 
 window.addEventListener("resize",()=>{
-
 camera.aspect=window.innerWidth/window.innerHeight;
 camera.updateProjectionMatrix();
 renderer.setSize(window.innerWidth,window.innerHeight);
-
 });
 
 </script>
